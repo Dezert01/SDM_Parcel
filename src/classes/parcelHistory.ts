@@ -15,4 +15,8 @@ export class ParcelHistory {
     this.depositTime = depositTime;
     this.collectionTime = collectionTime;
   }
+
+  public updateCollectionTime(time: Date): void {
+    this.collectionTime = time;
+  }
 }

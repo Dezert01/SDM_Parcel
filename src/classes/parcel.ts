@@ -43,34 +43,42 @@ export class Parcel {
     this.recordOfTransit = [];
   }
 
-  updateRecord(date: Date, type: RecordType, place: string) {
+  updateRecord(date: Date, type: RecordType, place: string | null): void {
     this.recordOfTransit.push(new TransitRecord(date, type, place));
   }
 
-  updateRecipentLocker(locker: Locker) {
+  updateRecipentLocker(locker: Locker): void {
     this.recpientLocker = locker;
   }
 
-  updateGuaranteedDeliveryTime() {
+  updateGuaranteedDeliveryTime(): void {
     this.guaranteedDeliveryTime = dayjs(this.guaranteedDeliveryTime)
       .add(2, "day")
       .toDate();
   }
 
-  getTransitRecords() {
+  getTransitRecords(): TransitRecord[] {
     return this.recordOfTransit;
   }
 
-  getGuaranteedDelivery() {
+  getGuaranteedDelivery(): Date {
     return this.guaranteedDeliveryTime;
   }
 
-  getEstimatedDelivery() {
+  getEstimatedDelivery(): Date {
     return this.estimatedDeliveryTime;
   }
 
-  setPaid() {
+  setPaid(): boolean {
     this.isPaidFor = true;
-    return true;
+    return this.isPaidFor;
+  }
+
+  setActualDeliveryTime(date: Date): void {
+    this.actualDeliveryTime = date;
+  }
+
+  setActualPickupTime(date: Date): void {
+    this.actualPickupTime = date;
   }
 }

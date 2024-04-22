@@ -39,7 +39,7 @@ export class User {
     }
   }
 
-  public addParcelToAccount(parcel: Parcel, sentByUser: boolean) {
+  public addParcelToAccount(parcel: Parcel, sentByUser: boolean): void {
     if (sentByUser) {
       this.sentParcels.push(parcel);
     } else {

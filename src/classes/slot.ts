@@ -14,15 +14,15 @@ export class Slot {
     this.isClosed = false;
   }
 
-  public openSlot() {
+  public openSlot(): void {
     this.isClosed = false;
   }
 
-  public closeSlot() {
+  public closeSlot(): void {
     this.isClosed = true;
   }
 
-  public getParcel() {
+  public getParcel(): Parcel | null {
     return this.parcel;
   }
 

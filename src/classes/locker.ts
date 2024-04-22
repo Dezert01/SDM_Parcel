@@ -11,7 +11,7 @@ export class Locker {
   private slots: Slot[];
   private historyRecord: ParcelHistory[];
   private incomingParcels: Parcel[];
-  private userPanel: UserPanel;
+  public userPanel: UserPanel;
 
   public constructor(
     id: number,
@@ -27,13 +27,12 @@ export class Locker {
     this.userPanel = new UserPanel(slots);
   }
 
-  public changeLockerAddress(newAddress: string) {
+  public changeLockerAddress(newAddress: string): void {
     this.address = newAddress;
   }
 
-  public getHistoryOfParcels() {
+  public getHistoryOfParcels(): ParcelHistory[] {
     const oneWeekAgo = dayjs().subtract(7, "day");
-
     const recentParcels = this.historyRecord.filter((parcelHistory) =>
       dayjs(parcelHistory.depositTime).isAfter(oneWeekAgo),
     );
@@ -41,21 +40,25 @@ export class Locker {
     return recentParcels;
   }
 
-  public getHistoryOfParcel(parcelId: number) {
-    const parcelHistory = this.historyRecord.find(
+  public getHistoryOfParcel(parcelId: number): ParcelHistory[] {
+    const parcelHistory = this.historyRecord.filter(
       (parcelHistory) => parcelHistory.parcelId === parcelId,
     );
     return parcelHistory;
   }
 
-  public getPlannedParcels() {
+  public getPlannedParcels(): Parcel[] {
     return this.incomingParcels;
   }
 
-  public moveToExternalStorage(parcel_id: number, place: string) {
-    const parcel = this.slots
-      .find((slot) => slot.getParcel()?.id === parcel_id)
-      ?.getParcel();
+  public moveToExternalStorage(
+    parcel_id: number,
+    place: string,
+  ): Parcel | null {
+    const parcel =
+      this.slots
+        .find((slot) => slot.getParcel()?.id === parcel_id)
+        ?.getParcel() || null;
     if (parcel) {
       parcel.updateRecord(
         new Date(),
@@ -66,7 +69,7 @@ export class Locker {
     return parcel;
   }
 
-  public getAddress() {
+  public getAddress(): string {
     return this.address;
   }
 }

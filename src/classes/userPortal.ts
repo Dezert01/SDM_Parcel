@@ -27,7 +27,7 @@ export class UserPortal {
     userId: number,
     parcelId: number,
     notificationText: string,
-  ) {
+  ): void {
     const user = this.users.find((user) => user.id === userId);
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!user || !parcel) {
@@ -38,7 +38,7 @@ export class UserPortal {
     );
   }
 
-  public rerouteParcel(parcelId: number, locker: Locker) {
+  public rerouteParcel(parcelId: number, locker: Locker): void {
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!parcel) {
       throw new Error("Parcel not found");
@@ -53,7 +53,7 @@ export class UserPortal {
     recipientLockerId: number,
     senderLockerId: number,
     size: ParcelSize,
-  ) {
+  ): void {
     const parcelId =
       this.parcels.length > 0
         ? Math.max(...this.parcels.map((parcel) => parcel.id)) + 1
@@ -80,18 +80,20 @@ export class UserPortal {
       size,
     );
     parcel.updateRecipentLocker(recipientLocker);
-    parcel.updateRecord(
-      new Date(),
-      RecordType.PACKAGE_REGISTERED,
-      senderLocker.getAddress(),
-    );
+    parcel.updateRecord(new Date(), RecordType.PACKAGE_REGISTERED, null);
     this.parcels.push(parcel);
   }
-  public makePayment() {
+
+  public makePayment(parcelId: number): void {
+    const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
+    if (!parcel) {
+      throw new Error("Parcel not found");
+    }
+    parcel.updateRecord(new Date(), RecordType.PACKAGE_PAID_FOR, null);
     console.log("Payment made");
   }
 
-  public trackParcel(parcelId: number) {
+  public trackParcel(parcelId: number): void {
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!parcel) {
       throw new Error("Parcel not found");
@@ -99,7 +101,7 @@ export class UserPortal {
     console.log(`Parcel ${parcel.id} is at ${parcel.getTransitRecords()[0]}`);
   }
 
-  public extendRetrievalDate(parcelId: number) {
+  public extendRetrievalDate(parcelId: number): void {
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!parcel) {
       throw new Error("Parcel not found");

@@ -8,7 +8,7 @@ export class UserPanel {
     this.slots = slots;
   }
 
-  public sendParcel(parcel: Parcel) {
+  public sendParcel(parcel: Parcel): boolean {
     const slot = this.indicateSlot(parcel);
     if (slot) {
       slot.setParcel(parcel);
@@ -17,7 +17,7 @@ export class UserPanel {
     return false;
   }
 
-  public retrieveParcel(parcelId: number) {
+  public retrieveParcel(parcelId: number): Parcel | null {
     const slot = this.slots.find((slot) => slot.getParcel()?.id === parcelId);
     if (slot) {
       const parcel = slot.getParcel();
@@ -27,7 +27,7 @@ export class UserPanel {
     return null;
   }
 
-  public indicateSlot(parcel: Parcel) {
+  public indicateSlot(parcel: Parcel): Slot | null {
     const slot = this.slots.find(
       (slot) => slot.getParcel() === null && slot.size === parcel.parcelSize,
     );

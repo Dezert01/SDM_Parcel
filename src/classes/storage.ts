@@ -29,7 +29,7 @@ export class Storage {
     return null;
   }
 
-  public storeParcel(parcel: Parcel) {
+  public storeParcel(parcel: Parcel): void {
     if (this.type === StorageType.EXTERNAL_STORAGE) {
       parcel.updateRecord(
         new Date(),
