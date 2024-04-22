@@ -1,46 +1,72 @@
-import { Address } from "./address";
+import dayjs from "dayjs";
+import { ParcelHistory } from "./parcelHistory";
 import { Slot } from "./slot";
+import { Parcel } from "./parcel";
+import { RecordType } from "../enums/RecordType";
+import { UserPanel } from "./userPanel";
 
 export class Locker {
-  public id: number;
-  public address: Address;
-  public slots: Slot[];
-  // record: null; // TODO: define
+  readonly id: number;
+  private address: string;
+  private slots: Slot[];
+  private historyRecord: ParcelHistory[];
+  private incomingParcels: Parcel[];
+  private userPanel: UserPanel;
 
   public constructor(
     id: number,
-    address: Address,
+    address: string,
     slots: Slot[],
-    // record: null,
+    historyRecord: ParcelHistory[],
   ) {
     this.id = id;
     this.address = address;
     this.slots = slots;
+    this.historyRecord = historyRecord;
+    this.incomingParcels = [];
+    this.userPanel = new UserPanel(slots);
   }
 
-  public changeLockerAddress(newAddress: Address) {
+  public changeLockerAddress(newAddress: string) {
     this.address = newAddress;
   }
 
-  // todo: define record class
-  // public getHistoryOfParcels() {
-  //   return this.record;
-  // }
+  public getHistoryOfParcels() {
+    const oneWeekAgo = dayjs().subtract(7, "day");
 
-  public getHistoryOfParcel(parcelId: number) {
-    const slotWithParcel = this.slots.find(
-      (slot) => slot.parcel && slot.parcel.id === parcelId,
+    const recentParcels = this.historyRecord.filter((parcelHistory) =>
+      dayjs(parcelHistory.depositTime).isAfter(oneWeekAgo),
     );
-    if (slotWithParcel && slotWithParcel.parcel) {
-      return slotWithParcel.parcel.record;
-    } else {
-      return undefined;
-    }
+
+    return recentParcels;
   }
 
-  // todo
-  public getPlannedParcels() {}
+  public getHistoryOfParcel(parcelId: number) {
+    const parcelHistory = this.historyRecord.find(
+      (parcelHistory) => parcelHistory.parcelId === parcelId,
+    );
+    return parcelHistory;
+  }
 
-  // todo
-  public moveToExternalStorage(parcelId: number) {}
+  public getPlannedParcels() {
+    return this.incomingParcels;
+  }
+
+  public moveToExternalStorage(parcel_id: number, place: string) {
+    const parcel = this.slots
+      .find((slot) => slot.getParcel()?.id === parcel_id)
+      ?.getParcel();
+    if (parcel) {
+      parcel.updateRecord(
+        new Date(),
+        RecordType.PACKAGE_IN_EXTERNAL_STORAGE,
+        place,
+      );
+    }
+    return parcel;
+  }
+
+  public getAddress() {
+    return this.address;
+  }
 }

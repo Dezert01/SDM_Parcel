@@ -1,17 +1,14 @@
+import { ParcelSize } from "../enums/ParcelSize";
 import { Parcel } from "./parcel";
 
 export class Slot {
-  public lockerId: number;
-  public size: "sm" | "md" | "lg";
-  public parcel: Parcel | undefined;
-  public isClosed: boolean;
+  readonly id: number;
+  readonly size: ParcelSize;
+  private parcel: Parcel | null;
+  private isClosed: boolean;
 
-  public constructor(
-    lockerId: number,
-    size: "sm" | "md" | "lg",
-    parcel: Parcel | undefined,
-  ) {
-    this.lockerId = lockerId;
+  public constructor(id: number, size: ParcelSize, parcel: Parcel | null) {
+    this.id = id;
     this.size = size;
     this.parcel = parcel;
     this.isClosed = false;
@@ -23,5 +20,13 @@ export class Slot {
 
   public closeSlot() {
     this.isClosed = true;
+  }
+
+  public getParcel() {
+    return this.parcel;
+  }
+
+  public setParcel(parcel: Parcel | null) {
+    this.parcel = parcel;
   }
 }

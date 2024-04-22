@@ -1,17 +1,26 @@
+import { ParcelSize } from "../enums/ParcelSize";
+import { RecordType } from "../enums/RecordType";
 import { Locker } from "./locker";
 import { Parcel } from "./parcel";
 import { User } from "./user";
 import dayjs from "dayjs";
 
 export class UserPortal {
-  public lockers: Locker[];
-  public parcels: Parcel[];
-  public users: User[];
+  private lockers: Locker[];
+  private parcels: Parcel[];
+  private users: User[];
+  private storages: Storage[];
 
-  public constructor(lockers: Locker[], parcels: Parcel[], users: User[]) {
+  public constructor(
+    lockers: Locker[],
+    parcels: Parcel[],
+    users: User[],
+    storages: Storage[],
+  ) {
     this.lockers = lockers;
     this.parcels = parcels;
     this.users = users;
+    this.storages = storages;
   }
 
   public sendNotification(
@@ -29,20 +38,21 @@ export class UserPortal {
     );
   }
 
-  public rerouteParcel(parcelId: number, lockerId: number) {
+  public rerouteParcel(parcelId: number, locker: Locker) {
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!parcel) {
       throw new Error("Parcel not found");
     }
-    parcel.updateRecipientLocker(lockerId);
-    console.log(`Rerouting parcel ${parcel.id} to locker ${lockerId}`);
+    parcel.updateRecipentLocker(locker);
+    console.log(`Rerouting parcel ${parcel.id} to locker ${locker.id}`);
   }
 
   public registerParcel(
     userId: number,
     recipientId: number,
-    lockerId: number,
-    size: "sm" | "md" | "lg",
+    recipientLockerId: number,
+    senderLockerId: number,
+    size: ParcelSize,
   ) {
     const parcelId =
       this.parcels.length > 0
@@ -50,32 +60,43 @@ export class UserPortal {
         : 1;
     const sender = this.users.find((user) => user.id === userId);
     const recipient = this.users.find((user) => user.id === recipientId);
-    const locker = this.lockers.find((locker) => locker.id === lockerId);
-    if (!sender || !recipient || !locker) {
+    const senderLocker = this.lockers.find(
+      (locker) => locker.id === senderLockerId,
+    );
+    const recipientLocker = this.lockers.find(
+      (locker) => locker.id === recipientLockerId,
+    );
+    if (!sender || !recipient || !senderLocker || !recipientLocker) {
       throw new Error("User or locker not found");
     }
     const parcel = new Parcel(
       parcelId,
       sender,
       recipient,
-      dayjs().add(7, "day").toDate(),
-      dayjs().add(10, "day").toDate(),
-      [],
+      recipientLocker,
+      senderLocker,
+      dayjs().add(2, "day").toDate(),
+      dayjs().add(5, "day").toDate(),
       size,
-      lockerId,
     );
-    parcel.updateRecipientLocker(lockerId);
+    parcel.updateRecipentLocker(recipientLocker);
+    parcel.updateRecord(
+      new Date(),
+      RecordType.PACKAGE_REGISTERED,
+      senderLocker.getAddress(),
+    );
     this.parcels.push(parcel);
   }
   public makePayment() {
     console.log("Payment made");
   }
+
   public trackParcel(parcelId: number) {
     const parcel = this.parcels.find((parcel) => parcel.id === parcelId);
     if (!parcel) {
       throw new Error("Parcel not found");
     }
-    console.log(`Parcel ${parcel.id} is at ${parcel.record[0].place.city}`);
+    console.log(`Parcel ${parcel.id} is at ${parcel.getTransitRecords()[0]}`);
   }
 
   public extendRetrievalDate(parcelId: number) {
@@ -83,11 +104,9 @@ export class UserPortal {
     if (!parcel) {
       throw new Error("Parcel not found");
     }
-    parcel.guaranteedDelivery = dayjs(parcel.guaranteedDelivery)
-      .add(2, "day")
-      .toDate();
+    parcel.updateGuaranteedDeliveryTime();
     console.log(
-      `Extended retrieval date for parcel ${parcel.id} to ${parcel.guaranteedDelivery}`,
+      `Extended retrieval date for parcel ${parcel.id} to ${parcel.getGuaranteedDelivery()}`,
     );
   }
 }
