@@ -6,21 +6,23 @@ export class Parcel {
   public id: number;
   public sender: User;
   public recipient: User;
-  public estimatedDelivery: number; // timestamp
-  public actualDelivery: number | undefined; // timestamp
-  public guaranteedDelivery: number; // timestamp
-  public actualPickup: number | undefined; // timestamp
+  public estimatedDelivery: Date; // timestamp
+  public actualDelivery: Date | undefined; // timestamp
+  public guaranteedDelivery: Date; // timestamp
+  public actualPickup: Date | undefined; // timestamp
   public record: TransitEvent[];
   public size: "sm" | "md" | "lg";
+  public recipientLockerId: number;
 
   public constructor(
     id: number,
     sender: User,
     recipient: User,
-    estimatedDelivery: number,
-    guaranteedDelivery: number,
+    estimatedDelivery: Date,
+    guaranteedDelivery: Date,
     record: TransitEvent[],
     size: "sm" | "md" | "lg",
+    recipientLockerId: number,
   ) {
     this.id = id;
     this.sender = sender;
@@ -29,6 +31,7 @@ export class Parcel {
     this.estimatedDelivery = estimatedDelivery;
     this.record = record;
     this.size = size;
+    this.recipientLockerId = recipientLockerId;
   }
 
   public updateRecord(date: number, type: string, place: Address) {
@@ -36,6 +39,7 @@ export class Parcel {
     this.record.push(newEvent);
   }
   public updateRecipientLocker(lockerId: number) {
-    // todo
+    this.recipientLockerId = lockerId;
+    console.log(`Parcel ${this.id} recipient locker updated to ${lockerId}`);
   }
 }
