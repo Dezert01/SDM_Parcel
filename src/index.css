@@ -26,3 +26,6 @@ body {
 input {
   @apply rounded-md border-2 border-black/20;
 }
+label {
+  @apply mt-2 border-t-2;
+}
