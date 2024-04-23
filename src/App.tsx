@@ -1,7 +1,13 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { User } from "./classes/user";
-import { useSystemStore } from "./stores/store";
+import { useSystemStore } from "./stores/systemStore";
 import RegisterParcel from "./components/registerParcel";
+import SentParcels from "./components/sentParcels";
+import ReceivedParcels from "./components/receivedParcels";
+import { useUserStore } from "./stores/userStore";
+import { useMockParcels } from "./mock-data/parcels";
+import { useParcelStore } from "./stores/parcelStore";
+import { Parcel } from "./classes/parcel";
 
 function App() {
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
@@ -9,7 +15,21 @@ function App() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
-  const store = useSystemStore();
+  const systemStore = useSystemStore();
+  const userStore = useUserStore();
+  const parcelStore = useParcelStore();
+
+  const mockParcels = useMockParcels();
+
+  useEffect(() => {
+    parcelStore.setParcels(mockParcels);
+    mockParcels.forEach((el) => {
+      const sender = el.getSender().name;
+      const recipient = el.getRecipient().name;
+      userStore.getUserByName(sender)?.addParcelToAccount(el, true);
+      userStore.getUserByName(recipient)?.addParcelToAccount(el, false);
+    });
+  }, []);
 
   const handleSigning = () => {
     if (
@@ -24,12 +44,12 @@ function App() {
     if (isSigningUp) {
       // New Account
       if (!phoneRef || !phoneRef.current) return;
-      let user = store.getUserByName(usernameRef.current?.value);
+      let user = userStore.getUserByName(usernameRef.current?.value);
       if (user) {
         alert("User of given username already exists");
         return;
       }
-      user = store.getUserByPhone(Number(phoneRef.current?.value));
+      user = userStore.getUserByPhone(Number(phoneRef.current?.value));
       if (user) {
         alert("Given phone number is already assigned to existing account");
         return;
@@ -38,7 +58,7 @@ function App() {
         alert("Password has to be at least 5 character length");
         return;
       }
-      const highestId = store.users.reduce((maxId, user) => {
+      const highestId = userStore.users.reduce((maxId, user) => {
         return user.id > maxId ? user.id : maxId;
       }, 0);
       const newUser = new User(
@@ -47,22 +67,22 @@ function App() {
         passwordRef.current?.value,
         Number(phoneRef.current?.value),
       );
-      store.addUser(newUser);
+      userStore.addUser(newUser);
       alert("You created new account. You can sign in Now");
       setIsSigningUp(false);
     } else {
       // Login In
-      const user = store.getUserByName(usernameRef.current?.value);
+      const user = userStore.getUserByName(usernameRef.current?.value);
       const confirmPassword = user?.password === passwordRef.current?.value;
       if (user && confirmPassword) {
-        store.setCurrentUser(user.name);
+        systemStore.setCurrentUser(user.name);
         alert(`Sucessful sign in as ${user.name}`);
       } else {
         alert("Wrong username or password");
       }
     }
   };
-  if (!store.currentUser)
+  if (!systemStore.currentUser)
     return (
       <div className="card">
         <h1>{isSigningUp ? "Sign Up" : "Sign In"}</h1>
@@ -89,16 +109,18 @@ function App() {
     <div className="flex h-full w-full flex-wrap gap-2">
       <div className="card">
         <h1>Currently logged in as:</h1>
-        <h2 className="font-bold">{store.currentUser}</h2>
+        <h2 className="font-bold">{systemStore.currentUser}</h2>
         <button
           className="button"
-          onClick={() => store.setCurrentUser(undefined)}
+          onClick={() => systemStore.setCurrentUser(undefined)}
         >
           Sign out
         </button>
       </div>
 
       <RegisterParcel />
+      <SentParcels />
+      <ReceivedParcels />
     </div>
   );
 }
