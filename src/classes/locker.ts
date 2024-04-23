@@ -7,7 +7,7 @@ import { UserPanel } from "./userPanel";
 
 export class Locker {
   readonly id: number;
-  private address: string;
+  public address: string;
   private slots: Slot[];
   private historyRecord: ParcelHistory[];
   private incomingParcels: Parcel[];

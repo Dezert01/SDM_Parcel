@@ -9,7 +9,7 @@ export class Parcel {
   readonly id: number;
   private readonly sender: User;
   private readonly recipient: User;
-  private recpientLocker: Locker;
+  private recipientLocker: Locker;
   private readonly senderLocker: Locker;
   private estimatedDeliveryTime: Date;
   private actualDeliveryTime: Date | null;
@@ -32,7 +32,7 @@ export class Parcel {
     this.id = id;
     this.sender = sender;
     this.recipient = recipient;
-    this.recpientLocker = recpientLocker;
+    this.recipientLocker = recpientLocker;
     this.senderLocker = senderLocker;
     this.estimatedDeliveryTime = estimatedDeliveryTime;
     this.guaranteedDeliveryTime = guaranteedDeliveryTime;
@@ -48,7 +48,7 @@ export class Parcel {
   }
 
   updateRecipentLocker(locker: Locker): void {
-    this.recpientLocker = locker;
+    this.recipientLocker = locker;
   }
 
   updateGuaranteedDeliveryTime(): void {
