@@ -81,4 +81,11 @@ export class Parcel {
   setActualPickupTime(date: Date): void {
     this.actualPickupTime = date;
   }
+
+  public getSender(): User {
+    return this.sender;
+  }
+  public getRecipient(): User {
+    return this.recipient;
+  }
 }

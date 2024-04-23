@@ -41,9 +41,18 @@ export class User {
 
   public addParcelToAccount(parcel: Parcel, sentByUser: boolean): void {
     if (sentByUser) {
+      if (this.sentParcels.find((el) => el.id === parcel.id)) return;
       this.sentParcels.push(parcel);
     } else {
+      if (this.receivedParcels.find((el) => el.id === parcel.id)) return;
       this.receivedParcels.push(parcel);
     }
+  }
+
+  public getSentParcels() {
+    return this.sentParcels;
+  }
+  public getReceivedParcels() {
+    return this.receivedParcels;
   }
 }
