@@ -16,3 +16,10 @@ body {
   width: 100vw;
   height: 100vh;
 }
+
+.card {
+  @apply flex flex-col rounded-md p-2 shadow;
+}
+.button {
+  @apply rounded-sm bg-amber-400 hover:bg-amber-500;
+}
