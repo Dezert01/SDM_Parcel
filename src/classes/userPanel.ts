@@ -1,3 +1,4 @@
+import { RecordType } from "@/enums/RecordType";
 import { Parcel } from "./parcel";
 import { Slot } from "./slot";
 
@@ -12,6 +13,11 @@ export class UserPanel {
     const slot = this.indicateSlot(parcel);
     if (slot) {
       slot.setParcel(parcel);
+      parcel.updateRecord(
+        new Date(),
+        RecordType.PACKAGE_IN_SENDER_LOCKER,
+        null, // todo: add place
+      );
       return true;
     }
     return false;
