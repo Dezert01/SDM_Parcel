@@ -21,7 +21,7 @@ body {
   @apply flex flex-col rounded-md p-2 shadow;
 }
 .button {
-  @apply rounded-sm bg-amber-400 hover:bg-amber-500;
+  @apply rounded-sm bg-amber-400 px-2 hover:bg-amber-500;
 }
 input {
   @apply rounded-md border-2 border-black/20;

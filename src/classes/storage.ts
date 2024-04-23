@@ -2,7 +2,7 @@ import { RecordType } from "../enums/RecordType";
 import { StorageType } from "../enums/StorageType";
 import { Parcel } from "./parcel";
 
-export class Storage {
+export class CStorage {
   readonly id: number;
   private address: string;
   private parcels: Parcel[];

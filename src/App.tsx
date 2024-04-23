@@ -1,13 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { User } from "./classes/user";
-import { useSystemStore } from "./stores/systemStore";
+import { useRef, useState } from "react";
 import RegisterParcel from "./components/registerParcel";
 import SentParcels from "./components/sentParcels";
 import ReceivedParcels from "./components/receivedParcels";
-import { useUserStore } from "./stores/userStore";
-import { useMockParcels } from "./mock-data/parcels";
-import { useParcelStore } from "./stores/parcelStore";
-import { Parcel } from "./classes/parcel";
+import { useUserPortal } from "./stores/useUserPortal";
+import { useSystemStore } from "./stores/systemStore";
 
 function App() {
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
@@ -15,21 +11,9 @@ function App() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
+  const userPortal = useUserPortal;
+
   const systemStore = useSystemStore();
-  const userStore = useUserStore();
-  const parcelStore = useParcelStore();
-
-  const mockParcels = useMockParcels();
-
-  useEffect(() => {
-    parcelStore.setParcels(mockParcels);
-    mockParcels.forEach((el) => {
-      const sender = el.getSender().name;
-      const recipient = el.getRecipient().name;
-      userStore.getUserByName(sender)?.addParcelToAccount(el, true);
-      userStore.getUserByName(recipient)?.addParcelToAccount(el, false);
-    });
-  }, []);
 
   const handleSigning = () => {
     if (
@@ -44,35 +28,30 @@ function App() {
     if (isSigningUp) {
       // New Account
       if (!phoneRef || !phoneRef.current) return;
-      let user = userStore.getUserByName(usernameRef.current?.value);
+      let user = userPortal.getUserByName(usernameRef.current.value);
       if (user) {
         alert("User of given username already exists");
         return;
       }
-      user = userStore.getUserByPhone(Number(phoneRef.current?.value));
+      user = userPortal.getUserByPhone(Number(phoneRef.current.value));
       if (user) {
         alert("Given phone number is already assigned to existing account");
         return;
       }
-      if (passwordRef.current?.value.length < 5) {
+      if (passwordRef.current.value.length < 5) {
         alert("Password has to be at least 5 character length");
         return;
       }
-      const highestId = userStore.users.reduce((maxId, user) => {
-        return user.id > maxId ? user.id : maxId;
-      }, 0);
-      const newUser = new User(
-        usernameRef.current?.value,
-        highestId ? highestId + 1 : 1,
-        passwordRef.current?.value,
-        Number(phoneRef.current?.value),
+      userPortal.registerUser(
+        usernameRef.current.value,
+        passwordRef.current.value,
+        Number(phoneRef.current.value),
       );
-      userStore.addUser(newUser);
       alert("You created new account. You can sign in Now");
       setIsSigningUp(false);
     } else {
       // Login In
-      const user = userStore.getUserByName(usernameRef.current?.value);
+      const user = userPortal.getUserByName(usernameRef.current?.value);
       const confirmPassword = user?.password === passwordRef.current?.value;
       if (user && confirmPassword) {
         systemStore.setCurrentUser(user.name);

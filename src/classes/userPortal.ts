@@ -2,6 +2,7 @@ import { ParcelSize } from "../enums/ParcelSize";
 import { RecordType } from "../enums/RecordType";
 import { Locker } from "./locker";
 import { Parcel } from "./parcel";
+import { CStorage } from "./storage";
 import { User } from "./user";
 import dayjs from "dayjs";
 
@@ -9,13 +10,13 @@ export class UserPortal {
   private lockers: Locker[];
   private parcels: Parcel[];
   private users: User[];
-  private storages: Storage[];
+  private storages: CStorage[];
 
   public constructor(
     lockers: Locker[],
     parcels: Parcel[],
     users: User[],
-    storages: Storage[],
+    storages: CStorage[],
   ) {
     this.lockers = lockers;
     this.parcels = parcels;
@@ -66,7 +67,9 @@ export class UserPortal {
     const recipientLocker = this.lockers.find(
       (locker) => locker.id === recipientLockerId,
     );
+    console.log(senderLockerId);
     if (!sender || !recipient || !senderLocker || !recipientLocker) {
+      console.log(sender, recipient, senderLocker, recipientLocker);
       throw new Error("User or locker not found");
     }
     const parcel = new Parcel(
@@ -79,6 +82,8 @@ export class UserPortal {
       dayjs().add(5, "day").toDate(),
       size,
     );
+    sender.addParcelToAccount(parcel, true);
+    recipient.addParcelToAccount(parcel, false);
     parcel.updateRecipentLocker(recipientLocker);
     parcel.updateRecord(new Date(), RecordType.PACKAGE_REGISTERED, null);
     this.parcels.push(parcel);
@@ -110,5 +115,26 @@ export class UserPortal {
     console.log(
       `Extended retrieval date for parcel ${parcel.id} to ${parcel.getGuaranteedDelivery()}`,
     );
+  }
+
+  public registerUser(name: string, password: string, phone: number): void {
+    const highestId = this.users.reduce((maxId, user) => {
+      return user.id > maxId ? user.id : maxId;
+    }, 0);
+    const id = highestId ? highestId + 1 : 1;
+    const user = new User(name, id, password, phone);
+    this.users.push(user);
+  }
+
+  public getUserByName(name: string): User | undefined {
+    return this.users.find((user) => user.name === name);
+  }
+
+  public getUserByPhone(phone: number): User | undefined {
+    return this.users.find((user) => user.phone === phone);
+  }
+
+  public getLockers(): Locker[] {
+    return this.lockers;
   }
 }

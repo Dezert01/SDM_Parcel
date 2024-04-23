@@ -3,10 +3,7 @@ import { ParcelSize } from "../enums/ParcelSize";
 import { Parcel } from "../classes/parcel";
 import { useSystemStore } from "../stores/systemStore";
 import { Locker } from "../classes/locker";
-import { useUserStore } from "../stores/userStore";
-import { useParcelStore } from "../stores/parcelStore";
-import { useLockerStore } from "../stores/lockerStore";
-
+import { useUserPortal } from "../stores/useUserPortal";
 const RegisterParcel: React.FC = () => {
   const [recipientPhone, setRecipientPhone] = useState<number>();
   const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState<Date>();
@@ -17,17 +14,16 @@ const RegisterParcel: React.FC = () => {
   const [selectedSenderLocker, setSelectedSenderLocker] =
     useState<Locker | null>(null);
 
+  const userPortal = useUserPortal;
+
   const systemStore = useSystemStore();
-  const userStore = useUserStore();
-  const parcelStore = useParcelStore();
-  const lockerStore = useLockerStore();
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!systemStore.currentUser) return;
 
-    const sender = userStore.getUserByName(systemStore.currentUser);
+    const sender = userPortal.getUserByName(systemStore.currentUser);
 
     if (!sender) {
       alert("Please sign in");
@@ -38,31 +34,20 @@ const RegisterParcel: React.FC = () => {
       alert("Provide recipient's phone number");
       return;
     }
-    const recipient = userStore.getUserByPhone(recipientPhone);
+    const recipient = userPortal.getUserByPhone(recipientPhone);
     if (!recipient) {
       alert("No user of given phone number found");
       return;
     }
-    const highestId = parcelStore.parcels.reduce((maxId, user) => {
-      return user.id > maxId ? user.id : maxId;
-    }, 0);
 
-    const newParcel: Parcel = new Parcel(
-      highestId ? highestId + 1 : 1,
-      sender!,
-      recipient,
-      selectedRecipientLocker!,
-      selectedSenderLocker!,
-      estimatedDeliveryTime!,
-      guaranteedDeliveryTime!,
+    userPortal.registerParcel(
+      sender.id,
+      recipient.id,
+      selectedRecipientLocker?.id || 0,
+      selectedSenderLocker?.id || 0,
       parcelSize,
     );
-
-    sender.addParcelToAccount(newParcel, true);
-    recipient.addParcelToAccount(newParcel, false);
-    parcelStore.addParcel(newParcel);
-    console.log(parcelStore.parcels);
-    console.log(userStore.users);
+    console.log(userPortal);
   };
 
   return (
@@ -110,14 +95,14 @@ const RegisterParcel: React.FC = () => {
           value={selectedSenderLocker?.id}
           onChange={(e) => {
             const selectedLockerId = parseInt(e.target.value);
-            const locker = lockerStore.lockers.find(
-              (locker) => locker.id === selectedLockerId,
-            );
+            const locker = userPortal
+              .getLockers()
+              .find((locker) => locker.id === selectedLockerId);
             setSelectedSenderLocker(locker || null);
           }}
           required
         >
-          {lockerStore.lockers.map((locker) => (
+          {userPortal.getLockers().map((locker) => (
             <option key={locker.id} value={locker.id}>
               {locker.address}
             </option>
@@ -128,14 +113,14 @@ const RegisterParcel: React.FC = () => {
           value={selectedRecipientLocker?.id}
           onChange={(e) => {
             const selectedLockerId = parseInt(e.target.value);
-            const locker = lockerStore.lockers.find(
-              (locker) => locker.id === selectedLockerId,
-            );
+            const locker = userPortal
+              .getLockers()
+              .find((locker) => locker.id === selectedLockerId);
             setSelectedRecipientLocker(locker || null);
           }}
           required
         >
-          {lockerStore.lockers.map((locker) => (
+          {userPortal.getLockers().map((locker) => (
             <option key={locker.id} value={locker.id}>
               {locker.address}
             </option>

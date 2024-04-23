@@ -1,14 +1,14 @@
 import { useSystemStore } from "../stores/systemStore";
-import { useUserStore } from "../stores/userStore";
 
+import { useUserPortal } from "../stores/useUserPortal";
 const SentParcels: React.FC = () => {
+  const userPortal = useUserPortal;
   const systemStore = useSystemStore();
-  const userStore = useUserStore();
   const currentUser = systemStore.currentUser;
   if (!currentUser) {
     return null;
   }
-  const user = userStore.getUserByName(currentUser);
+  const user = userPortal.getUserByName(currentUser);
   if (!user) {
     return null;
   }
@@ -18,6 +18,7 @@ const SentParcels: React.FC = () => {
       {user.getSentParcels().map((el, index) => (
         <div key={index}>
           <div>Parcel Id: {el.id}</div>
+          <button className="button">Details</button>
         </div>
       ))}
     </div>
