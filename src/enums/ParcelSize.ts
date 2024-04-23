@@ -1,4 +1,4 @@
-export const enum ParcelSize {
+export enum ParcelSize {
   SMALL = "SMALL",
   MEDIUM = "MEDIUM",
   LARGE = "LARGE",

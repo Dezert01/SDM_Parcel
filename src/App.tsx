@@ -1,10 +1,8 @@
 import { useRef, useState } from "react";
 import RegisterParcel from "./components/registerParcel";
-import SentParcels from "./components/sentParcels";
-import ReceivedParcels from "./components/receivedParcels";
+import Parcels from "./components/parcels";
 import { useUserPortal } from "./stores/useUserPortal";
 import { useSystemStore } from "./stores/systemStore";
-
 function App() {
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -55,7 +53,6 @@ function App() {
       const confirmPassword = user?.password === passwordRef.current?.value;
       if (user && confirmPassword) {
         systemStore.setCurrentUser(user.name);
-        alert(`Sucessful sign in as ${user.name}`);
       } else {
         alert("Wrong username or password");
       }
@@ -98,8 +95,7 @@ function App() {
       </div>
 
       <RegisterParcel />
-      <SentParcels />
-      <ReceivedParcels />
+      <Parcels />
     </div>
   );
 }

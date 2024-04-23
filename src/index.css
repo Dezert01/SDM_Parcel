@@ -29,3 +29,12 @@ input {
 label {
   @apply mt-2 border-t-2;
 }
+.dialog-details {
+  @apply flex flex-col gap-2;
+}
+.dialog-details > div {
+  @apply flex items-center justify-between border-b-2;
+}
+.dialog-details > div > div:first-of-type {
+  @apply font-bold;
+}

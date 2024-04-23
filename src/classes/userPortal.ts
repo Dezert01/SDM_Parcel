@@ -67,7 +67,6 @@ export class UserPortal {
     const recipientLocker = this.lockers.find(
       (locker) => locker.id === recipientLockerId,
     );
-    console.log(senderLockerId);
     if (!sender || !recipient || !senderLocker || !recipientLocker) {
       console.log(sender, recipient, senderLocker, recipientLocker);
       throw new Error("User or locker not found");
@@ -95,6 +94,7 @@ export class UserPortal {
       throw new Error("Parcel not found");
     }
     parcel.updateRecord(new Date(), RecordType.PACKAGE_PAID_FOR, null);
+    parcel.setPaid();
     console.log("Payment made");
   }
 
@@ -136,5 +136,9 @@ export class UserPortal {
 
   public getLockers(): Locker[] {
     return this.lockers;
+  }
+
+  public getParcels(): Parcel[] {
+    return this.parcels;
   }
 }

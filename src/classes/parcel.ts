@@ -88,4 +88,20 @@ export class Parcel {
   public getRecipient(): User {
     return this.recipient;
   }
+  public getParcelDetails() {
+    return {
+      id: this.id,
+      sender: this.sender,
+      recipient: this.recipient,
+      recipientLocker: this.recipientLocker,
+      senderLocker: this.senderLocker,
+      estimatedDeliveryTime: this.estimatedDeliveryTime,
+      guaranteedDeliveryTime: this.guaranteedDeliveryTime,
+      parcelSize: this.parcelSize,
+      isPaidFor: this.isPaidFor,
+      actualDeliveryTime: this.actualDeliveryTime,
+      actualPickupTime: this.actualPickupTime,
+      recordOfTransit: this.recordOfTransit,
+    };
+  }
 }

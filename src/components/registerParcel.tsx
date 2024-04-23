@@ -1,20 +1,18 @@
 import { useState } from "react";
 import { ParcelSize } from "../enums/ParcelSize";
-import { Parcel } from "../classes/parcel";
 import { useSystemStore } from "../stores/systemStore";
 import { Locker } from "../classes/locker";
 import { useUserPortal } from "../stores/useUserPortal";
 const RegisterParcel: React.FC = () => {
+  const userPortal = useUserPortal;
   const [recipientPhone, setRecipientPhone] = useState<number>();
   const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState<Date>();
   const [guaranteedDeliveryTime, setGuaranteedDeliveryTime] = useState<Date>();
   const [parcelSize, setParcelSize] = useState<ParcelSize>(ParcelSize.SMALL);
   const [selectedRecipientLocker, setSelectedRecipientLocker] =
-    useState<Locker | null>(null);
+    useState<Locker | null>(userPortal.getLockers()[0] || null);
   const [selectedSenderLocker, setSelectedSenderLocker] =
-    useState<Locker | null>(null);
-
-  const userPortal = useUserPortal;
+    useState<Locker | null>(userPortal.getLockers()[0] || null);
 
   const systemStore = useSystemStore();
 
