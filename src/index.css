@@ -23,3 +23,6 @@ body {
 .button {
   @apply rounded-sm bg-amber-400 hover:bg-amber-500;
 }
+input {
+  @apply rounded-md border-2 border-black/20;
+}
