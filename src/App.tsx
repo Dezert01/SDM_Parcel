@@ -26,6 +26,31 @@ function App() {
       // New Account
       if (!phoneRef || !phoneRef.current) return;
       let user = users.find((el) => el.name === usernameRef.current?.value);
+      if (user) {
+        alert("User of given username already exists");
+        return;
+      }
+      user = users.find((el) => String(el.phone) === phoneRef.current?.value);
+      if (user) {
+        alert("Given phone number is already assigned to existing account");
+        return;
+      }
+      if (passwordRef.current?.value.length < 5) {
+        alert("Password has to be at least 5 character length");
+        return;
+      }
+      const highestId = users.reduce((maxId, user) => {
+        return user.id > maxId ? user.id : maxId;
+      }, 0);
+      const newUser = new User(
+        usernameRef.current?.value,
+        highestId + 1,
+        passwordRef.current?.value,
+        Number(phoneRef.current?.value),
+      );
+      setUsers((prev) => [...prev, newUser]);
+      alert("You created new account. You can sign in Now");
+      setIsSigningUp(false);
     } else {
       // Login In
       const user = users.find((el) => el.name === usernameRef.current?.value);
@@ -36,8 +61,6 @@ function App() {
       } else {
         alert("Wrong username or password");
       }
-
-      console.log(user);
     }
   };
 
