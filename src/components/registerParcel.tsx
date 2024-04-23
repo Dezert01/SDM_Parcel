@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { ParcelSize } from "../enums/ParcelSize";
 import { Parcel } from "../classes/parcel";
-import { User } from "../classes/user";
-import { useSystemStore } from "../stores/store";
+import { useSystemStore } from "../stores/systemStore";
 import { Locker } from "../classes/locker";
+import { useUserStore } from "../stores/userStore";
+import { useParcelStore } from "../stores/parcelStore";
+import { useLockerStore } from "../stores/lockerStore";
 
 const RegisterParcel: React.FC = () => {
   const [recipientPhone, setRecipientPhone] = useState<number>();
@@ -15,14 +17,17 @@ const RegisterParcel: React.FC = () => {
   const [selectedSenderLocker, setSelectedSenderLocker] =
     useState<Locker | null>(null);
 
-  const store = useSystemStore();
+  const systemStore = useSystemStore();
+  const userStore = useUserStore();
+  const parcelStore = useParcelStore();
+  const lockerStore = useLockerStore();
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!store.currentUser) return;
+    if (!systemStore.currentUser) return;
 
-    const sender = store.getUserByName(store.currentUser!);
+    const sender = userStore.getUserByName(systemStore.currentUser);
 
     if (!sender) {
       alert("Please sign in");
@@ -33,12 +38,12 @@ const RegisterParcel: React.FC = () => {
       alert("Provide recipient's phone number");
       return;
     }
-    const recipient = store.getUserByPhone(recipientPhone);
+    const recipient = userStore.getUserByPhone(recipientPhone);
     if (!recipient) {
       alert("No user of given phone number found");
       return;
     }
-    const highestId = store.parcels.reduce((maxId, user) => {
+    const highestId = parcelStore.parcels.reduce((maxId, user) => {
       return user.id > maxId ? user.id : maxId;
     }, 0);
 
@@ -55,15 +60,16 @@ const RegisterParcel: React.FC = () => {
 
     sender.addParcelToAccount(newParcel, true);
     recipient.addParcelToAccount(newParcel, false);
-    store.addParcel(newParcel);
-    console.log("New Parcel:", newParcel);
-    console.log(store.parcels);
+    parcelStore.addParcel(newParcel);
+    console.log(parcelStore.parcels);
+    console.log(userStore.users);
   };
 
   return (
     <div className="card">
       <h1>Register new Parcel</h1>
       <form className="flex flex-col" onSubmit={handleFormSubmit}>
+        <label>Recipient's Phone</label>
         <input
           type="number"
           placeholder="Recipient's Phone"
@@ -71,6 +77,7 @@ const RegisterParcel: React.FC = () => {
           onChange={(e) => setRecipientPhone(parseInt(e.target.value))}
           required
         />
+        <label>Estimated Delivery Time</label>
         <input
           type="datetime-local"
           placeholder="Estimated Delivery Time"
@@ -78,6 +85,7 @@ const RegisterParcel: React.FC = () => {
           onChange={(e) => setEstimatedDeliveryTime(new Date(e.target.value))}
           required
         />
+        <label>Guaranteed Delivery Time</label>
         <input
           type="datetime-local"
           placeholder="Guaranteed Delivery Time"
@@ -85,6 +93,7 @@ const RegisterParcel: React.FC = () => {
           onChange={(e) => setGuaranteedDeliveryTime(new Date(e.target.value))}
           required
         />
+        <label>Parcel Size</label>
         <select
           value={parcelSize}
           onChange={(e) => setParcelSize(e.target.value as ParcelSize)}
@@ -101,14 +110,14 @@ const RegisterParcel: React.FC = () => {
           value={selectedSenderLocker?.id}
           onChange={(e) => {
             const selectedLockerId = parseInt(e.target.value);
-            const locker = store.lockers.find(
+            const locker = lockerStore.lockers.find(
               (locker) => locker.id === selectedLockerId,
             );
             setSelectedSenderLocker(locker || null);
           }}
           required
         >
-          {store.lockers.map((locker) => (
+          {lockerStore.lockers.map((locker) => (
             <option key={locker.id} value={locker.id}>
               {locker.address}
             </option>
@@ -119,20 +128,20 @@ const RegisterParcel: React.FC = () => {
           value={selectedRecipientLocker?.id}
           onChange={(e) => {
             const selectedLockerId = parseInt(e.target.value);
-            const locker = store.lockers.find(
+            const locker = lockerStore.lockers.find(
               (locker) => locker.id === selectedLockerId,
             );
             setSelectedRecipientLocker(locker || null);
           }}
           required
         >
-          {store.lockers.map((locker) => (
+          {lockerStore.lockers.map((locker) => (
             <option key={locker.id} value={locker.id}>
               {locker.address}
             </option>
           ))}
         </select>
-        <button className="button" type="submit">
+        <button className="button mt-4" type="submit">
           Register Parcel
         </button>
       </form>
