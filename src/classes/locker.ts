@@ -72,4 +72,8 @@ export class Locker {
   public getAddress(): string {
     return this.address;
   }
+
+  public getSlots(): Slot[] {
+    return this.slots;
+  }
 }

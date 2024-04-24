@@ -113,7 +113,7 @@ export class UserPortal {
     }
     parcel.updateGuaranteedDeliveryTime();
     console.log(
-      `Extended retrieval date for parcel ${parcel.id} to ${parcel.getGuaranteedDelivery()}`,
+      `Extended retrieval date for parcel ${parcel.id} to ${parcel.getGuaranteedDeliveryTime()}`,
     );
   }
 

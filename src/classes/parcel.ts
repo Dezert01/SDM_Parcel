@@ -61,12 +61,20 @@ export class Parcel {
     return this.recordOfTransit;
   }
 
-  getGuaranteedDelivery(): Date {
+  getGuaranteedDeliveryTime(): Date {
     return this.guaranteedDeliveryTime;
   }
 
-  getEstimatedDelivery(): Date {
+  getEstimatedDeliveryTime(): Date {
     return this.estimatedDeliveryTime;
+  }
+
+  getActualDeliveryTime(): Date | null {
+    return this.actualDeliveryTime;
+  }
+
+  getActualPickupTime(): Date | null {
+    return this.actualPickupTime;
   }
 
   setPaid(): boolean {
@@ -85,9 +93,20 @@ export class Parcel {
   public getSender(): User {
     return this.sender;
   }
+
   public getRecipient(): User {
     return this.recipient;
   }
+
+  public getSize(): ParcelSize {
+    return this.parcelSize;
+  }
+
+  public getPaidStatus(): boolean {
+    return this.isPaidFor;
+  }
+
+  // only for testing (admin panel)
   public getParcelDetails() {
     return {
       id: this.id,
