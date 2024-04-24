@@ -54,6 +54,50 @@ const Parcels: React.FC = () => {
     userPortal.extendRetrievalDate(parcelId);
   };
 
+  const handleDeliverToSenderLocker = (parcelId: number) => {
+    const parcel = userPortal
+      .getParcels()
+      .find((parcel) => parcel.id === parcelId);
+    if (!parcel) {
+      return;
+    }
+    const locker = parcel.getParcelDetails().senderLocker;
+    locker.userPanel.sendParcel(parcel);
+  };
+
+  const handleCollectFromSenderLocker = (parcelId: number) => {
+    const parcel = userPortal
+      .getParcels()
+      .find((parcel) => parcel.id === parcelId);
+    if (!parcel) {
+      return;
+    }
+    const locker = parcel.getParcelDetails().senderLocker;
+    locker.userPanel.retrieveParcel(parcel.id, true);
+  };
+
+  const handleDeliverToRecipientLocker = (parcelId: number) => {
+    const parcel = userPortal
+      .getParcels()
+      .find((parcel) => parcel.id === parcelId);
+    if (!parcel) {
+      return;
+    }
+    const locker = parcel.getParcelDetails().senderLocker;
+    locker.userPanel.deliverParcel(parcel);
+  };
+
+  const handlePickupFromRecipientLocker = (parcelId: number) => {
+    const parcel = userPortal
+      .getParcels()
+      .find((parcel) => parcel.id === parcelId);
+    if (!parcel) {
+      return;
+    }
+    const locker = parcel.getParcelDetails().senderLocker;
+    locker.userPanel.retrieveParcel(parcel.id, false);
+  };
+
   return (
     <div className="card">
       <div className="flex gap-8">
@@ -200,7 +244,8 @@ const Parcels: React.FC = () => {
               </table>
             </div>
             <div>
-              <h1>Reroute Locker</h1>
+              <h1>Actions</h1>
+              <h2>Reroute Locker</h2>
               <div className="flex items-center justify-between">
                 <select
                   value={newLocker || 0}
@@ -226,12 +271,40 @@ const Parcels: React.FC = () => {
                   Reroute
                 </button>
               </div>
-              <h1>Extend Retrieval Date</h1>
+              <h2>Extend Retrieval Date</h2>
               <button
                 className="button"
                 onClick={() => handleExtendRetrievalDate(parcel.id)}
               >
                 Extend
+              </button>
+              <h2>Deliver to sender's locker</h2>
+              <button
+                className="button"
+                onClick={() => handleDeliverToSenderLocker(parcel.id)}
+              >
+                Deliver
+              </button>
+              <h2>Collect from Sender's locker</h2>
+              <button
+                className="button"
+                onClick={() => handleCollectFromSenderLocker(parcel.id)}
+              >
+                Collect
+              </button>
+              <h2>Deliver to Recipient's locker</h2>
+              <button
+                className="button"
+                onClick={() => handleDeliverToRecipientLocker(parcel.id)}
+              >
+                Deliver
+              </button>
+              <h2>Pickup to Recipient's locker</h2>
+              <button
+                className="button"
+                onClick={() => handlePickupFromRecipientLocker(parcel.id)}
+              >
+                Pick-up
               </button>
             </div>
             <DialogFooter>
