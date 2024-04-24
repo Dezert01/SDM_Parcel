@@ -18,7 +18,7 @@ body {
 }
 
 .card {
-  @apply flex flex-col rounded-md p-2 shadow;
+  @apply flex flex-col rounded-md border-[1px] p-2 shadow;
 }
 .button {
   @apply rounded-sm bg-amber-400 px-2 hover:bg-amber-500;
