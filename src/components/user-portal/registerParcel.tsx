@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ParcelSize } from "../enums/ParcelSize";
-import { useSystemStore } from "../stores/systemStore";
-import { Locker } from "../classes/locker";
-import { useUserPortal } from "../stores/useUserPortal";
+import { ParcelSize } from "../../enums/ParcelSize";
+import { useSystemStore } from "../../stores/systemStore";
+import { Locker } from "../../classes/locker";
+import { useUserPortal } from "../../stores/useUserPortal";
 const RegisterParcel: React.FC = () => {
   const userPortal = useUserPortal;
   const [recipientPhone, setRecipientPhone] = useState<number>();

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useSystemStore } from "../stores/systemStore";
-import { useUserPortal } from "../stores/useUserPortal";
+import { useSystemStore } from "../../stores/systemStore";
+import { useUserPortal } from "../../stores/useUserPortal";
 import {
   Dialog,
   DialogContent,
@@ -9,14 +9,32 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TransitRecord } from "@/classes/transitRecord";
+import { User } from "@/classes/user";
+import { ParcelSize } from "@/enums/ParcelSize";
+
+type ParcelDetails = {
+  id: number;
+  size: ParcelSize;
+  sender: User;
+  recipient: User;
+  transitRecord: TransitRecord[];
+  guaranteedDeliveryTime: Date;
+  estimatedDeliveryTime: Date;
+  actualDeliveryTime: Date | null;
+  actualPickupTime: Date | null;
+  isPaidFor: boolean;
+};
+
 const Parcels: React.FC = () => {
   const userPortal = useUserPortal;
-  const [parcel, setParcel] = useState<any>(undefined);
-  const [openDialog, setOpenDialog] = useState(false);
+  const systemStore = useSystemStore();
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [parcelDetails, setParcelDetails] = useState<ParcelDetails | undefined>(
+    undefined,
+  );
   const [newLocker, setNewLocker] = useState<number | null>(
     userPortal.getLockers()[0].id || null,
   );
-  const systemStore = useSystemStore();
   const currentUser = systemStore.currentUser;
   if (!currentUser) {
     return null;
@@ -27,11 +45,20 @@ const Parcels: React.FC = () => {
   }
 
   const handleOpenDialog = (id: number) => {
-    const parcel = userPortal
-      .getParcels()
-      .find((parcel) => parcel.id === id)
-      ?.getParcelDetails();
-    setParcel(parcel);
+    const parcel = userPortal.getParcels().find((parcel) => parcel.id === id);
+    if (!parcel) return;
+    setParcelDetails({
+      id: parcel.id,
+      size: parcel.getSize(),
+      sender: parcel.getSender(),
+      recipient: parcel.getRecipient(),
+      transitRecord: parcel.getTransitRecords(),
+      guaranteedDeliveryTime: parcel.getGuaranteedDeliveryTime(),
+      estimatedDeliveryTime: parcel.getEstimatedDeliveryTime(),
+      actualDeliveryTime: parcel.getActualDeliveryTime(),
+      actualPickupTime: parcel.getActualPickupTime(),
+      isPaidFor: parcel.getPaidStatus(),
+    });
     setOpenDialog(true);
   };
 
@@ -131,85 +158,71 @@ const Parcels: React.FC = () => {
           ))}
         </div>
       </div>
-      {parcel ? (
+      {parcelDetails ? (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <DialogContent className="min-w-[25vw]">
             <DialogHeader>
-              <DialogTitle>Parcel ID: {parcel.id}</DialogTitle>
+              <DialogTitle>Parcel ID: {parcelDetails.id}</DialogTitle>
             </DialogHeader>
             <div className="dialog-details">
               <div>
                 <div>Parcel Size</div>
-                <div>{parcel.parcelSize}</div>
+                <div>{parcelDetails.size}</div>
               </div>
               <div>
                 <div>Sent by</div>
                 <div>
                   {"Username: " +
-                    parcel.sender.name +
+                    parcelDetails.sender.name +
                     ", Phone: " +
-                    parcel.sender.phone}
+                    parcelDetails.sender.phone}
                 </div>
               </div>
               <div>
                 <div>Sent to </div>
                 <div>
                   {"Username: " +
-                    parcel.recipient.name +
+                    parcelDetails.recipient.name +
                     ", Phone: " +
-                    parcel.recipient.phone}
-                </div>
-              </div>
-              <div>
-                <div>Sent from locker</div>
-                <div>
-                  {"ID: " +
-                    parcel.senderLocker.id +
-                    ", Address: " +
-                    parcel.senderLocker.address}
-                </div>
-              </div>
-              <div>
-                <div>Sent to locker</div>
-                <div>
-                  {"ID: " +
-                    parcel.recipientLocker.id +
-                    ", Address: " +
-                    parcel.recipientLocker.address}
+                    parcelDetails.recipient.phone}
                 </div>
               </div>
               <div>
                 <div>Estimated Delivery Time</div>
-                <div>{parcel.estimatedDeliveryTime.toLocaleString()}</div>
-              </div>
-              <div>
-                <div>Actual Delivery Time</div>
                 <div>
-                  {parcel.actualDeliveryTime
-                    ? parcel.actualDeliveryTime.toLocaleString()
-                    : "Not yet delivered"}
+                  {parcelDetails.estimatedDeliveryTime.toLocaleString()}
                 </div>
               </div>
               <div>
                 <div>Guaranteed Delivery Time</div>
-                <div>{parcel.guaranteedDeliveryTime.toLocaleString()}</div>
+                <div>
+                  {parcelDetails.guaranteedDeliveryTime.toLocaleString()}
+                </div>
+              </div>
+              <div>
+                <div>Actual Delivery Time</div>
+                <div>
+                  {parcelDetails.actualDeliveryTime
+                    ? parcelDetails.actualDeliveryTime.toLocaleString()
+                    : "Not yet delivered"}
+                </div>
               </div>
               <div>
                 <div>Actual Pickup Time</div>
                 <div>
-                  {parcel.actualPickupTime
-                    ? parcel.actualPickupTime.toLocaleString()
+                  {parcelDetails.actualPickupTime
+                    ? parcelDetails.actualPickupTime.toLocaleString()
                     : "Not yet picked up"}
                 </div>
               </div>
               <div>
                 <div>Is Paid For</div>
                 <div>
-                  {parcel.isPaidFor ? "Yes" : "No"}{" "}
-                  {!parcel.isPaidFor ? (
+                  {parcelDetails.isPaidFor ? "Yes" : "No"}{" "}
+                  {!parcelDetails.isPaidFor ? (
                     <button
                       className="button"
-                      onClick={() => handleMakePayment(parcel.id)}
+                      onClick={() => handleMakePayment(parcelDetails.id)}
                     >
                       Pay
                     </button>
@@ -227,7 +240,7 @@ const Parcels: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {parcel.recordOfTransit.map(
+                  {parcelDetails.transitRecord.map(
                     (record: TransitRecord, index: number) => (
                       <tr key={index}>
                         <td className="border-2">{record.type}</td>
@@ -245,7 +258,7 @@ const Parcels: React.FC = () => {
             </div>
             <div>
               <h1>Actions</h1>
-              <h2>Reroute Locker</h2>
+              <h2>Reroute LParcel</h2>
               <div className="flex items-center justify-between">
                 <select
                   value={newLocker || 0}
@@ -266,46 +279,13 @@ const Parcels: React.FC = () => {
                 </select>
                 <button
                   className="button"
-                  onClick={() => handleRerouteParcel(parcel.id, newLocker || 0)}
+                  onClick={() =>
+                    handleRerouteParcel(parcelDetails.id, newLocker || 0)
+                  }
                 >
                   Reroute
                 </button>
               </div>
-              <h2>Extend Retrieval Date</h2>
-              <button
-                className="button"
-                onClick={() => handleExtendRetrievalDate(parcel.id)}
-              >
-                Extend
-              </button>
-              <h2>Deliver to sender's locker</h2>
-              <button
-                className="button"
-                onClick={() => handleDeliverToSenderLocker(parcel.id)}
-              >
-                Deliver
-              </button>
-              <h2>Collect from Sender's locker</h2>
-              <button
-                className="button"
-                onClick={() => handleCollectFromSenderLocker(parcel.id)}
-              >
-                Collect
-              </button>
-              <h2>Deliver to Recipient's locker</h2>
-              <button
-                className="button"
-                onClick={() => handleDeliverToRecipientLocker(parcel.id)}
-              >
-                Deliver
-              </button>
-              <h2>Pickup to Recipient's locker</h2>
-              <button
-                className="button"
-                onClick={() => handlePickupFromRecipientLocker(parcel.id)}
-              >
-                Pick-up
-              </button>
             </div>
             <DialogFooter>
               <button className="button" onClick={() => setOpenDialog(false)}>
