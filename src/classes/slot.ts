@@ -11,7 +11,7 @@ export class Slot {
     this.id = id;
     this.size = size;
     this.parcel = parcel;
-    this.isClosed = false;
+    this.isClosed = true;
   }
 
   public openSlot(): void {

@@ -24,7 +24,7 @@ export class Locker {
     this.slots = slots;
     this.historyRecord = historyRecord;
     this.incomingParcels = [];
-    this.userPanel = new UserPanel(slots);
+    this.userPanel = new UserPanel(slots, address);
   }
 
   public changeLockerAddress(newAddress: string): void {
