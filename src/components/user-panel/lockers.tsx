@@ -111,6 +111,9 @@ const AllLockers: React.FC = () => {
                 ) : null;
               })}
               <h2>Send Parcel</h2>
+              <span className="text-xs opacity-50">
+                Only paid for parcels can be sent.
+              </span>
               <div>
                 <select
                   value={parcelToSend || 0}
@@ -147,6 +150,9 @@ const AllLockers: React.FC = () => {
                 </button>
               </div>
               <h2>Deliver Parcel</h2>
+              <span className="text-xs opacity-50">
+                Only parcels in transit can be delivered.
+              </span>
               <div>
                 <select
                   value={parcelToDeliver || 0}
