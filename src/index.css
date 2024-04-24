@@ -38,3 +38,9 @@ label {
 .dialog-details > div > div:first-of-type {
   @apply font-bold;
 }
+h1 {
+  @apply mb-2 text-2xl font-bold;
+}
+h2 {
+  @apply text-lg font-semibold;
+}
