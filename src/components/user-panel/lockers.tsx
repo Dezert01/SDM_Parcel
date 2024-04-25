@@ -70,7 +70,7 @@ const AllLockers: React.FC = () => {
       <h1>All Lockers</h1>
       {userPortal.getLockers().map((locker, index) => (
         <div key={index}>
-          <div>Parcel Id: {locker.id}</div>
+          <div>Locker Id: {locker.id}</div>
           <button
             className="button"
             onClick={() => handleOpenDialog(locker.id)}

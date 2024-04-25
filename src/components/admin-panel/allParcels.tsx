@@ -109,7 +109,7 @@ const AllParcels: React.FC = () => {
       </div>
       {parcel ? (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogContent className="min-w-[25vw]">
+          <DialogContent className="max-h-[80vh] min-w-[25vw] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Parcel ID: {parcel.id}</DialogTitle>
             </DialogHeader>
