@@ -4,7 +4,12 @@ import { mockParcels } from "../mock-data/parcels";
 import { mockStorages } from "../mock-data/storages";
 import { MockUsers } from "../mock-data/users";
 
-export const useUserPortal = new UserPortal(mockLockers, [], [], mockStorages);
+export const useUserPortal = UserPortal.getInstance(
+  mockLockers,
+  [],
+  [],
+  mockStorages,
+);
 
 MockUsers.forEach((user) => {
   useUserPortal.registerUser(user.name, user.password, user.phone);

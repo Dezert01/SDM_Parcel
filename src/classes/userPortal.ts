@@ -7,12 +7,14 @@ import { User } from "./user";
 import dayjs from "dayjs";
 
 export class UserPortal {
+  private static instance: UserPortal;
+
   private lockers: Locker[];
   private parcels: Parcel[];
   private users: User[];
   private storages: CStorage[];
 
-  public constructor(
+  private constructor(
     lockers: Locker[],
     parcels: Parcel[],
     users: User[],
@@ -22,6 +24,18 @@ export class UserPortal {
     this.parcels = parcels;
     this.users = users;
     this.storages = storages;
+  }
+
+  public static getInstance(
+    lockers: Locker[],
+    parcels: Parcel[],
+    users: User[],
+    storages: CStorage[],
+  ): UserPortal {
+    if (!UserPortal.instance) {
+      UserPortal.instance = new UserPortal(lockers, parcels, users, storages);
+    }
+    return UserPortal.instance;
   }
 
   public sendNotification(
