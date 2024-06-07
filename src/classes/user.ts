@@ -1,7 +1,8 @@
+import { IObserver } from "./observer";
 import { Parcel } from "./parcel";
 import { TransitRecord } from "./transitRecord";
 
-export class User {
+export class User implements IObserver {
   readonly id: number;
   readonly name: string;
   readonly password: string;
@@ -54,5 +55,11 @@ export class User {
   }
   public getReceivedParcels() {
     return this.receivedParcels;
+  }
+
+  public update(parcel: Parcel, notif: string): void {
+    console.log(
+      `User ${this.name} notified of update to parcel ${parcel.id}:\n${notif}\n`,
+    );
   }
 }

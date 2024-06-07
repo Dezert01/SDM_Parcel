@@ -1,11 +1,12 @@
 import { ParcelSize } from "../enums/ParcelSize";
 import { RecordType } from "../enums/RecordType";
 import { Locker } from "./locker";
+import { IObserver, ISubject } from "./observer";
 import { TransitRecord } from "./transitRecord";
 import { User } from "./user";
 import dayjs from "dayjs";
 
-export class Parcel {
+export class Parcel implements ISubject {
   readonly id: number;
   private readonly sender: User;
   private readonly recipient: User;
@@ -18,6 +19,8 @@ export class Parcel {
   private recordOfTransit: TransitRecord[];
   readonly parcelSize: ParcelSize;
   private isPaidFor: boolean;
+
+  private observers: IObserver[];
 
   public constructor(
     id: number,
@@ -41,20 +44,42 @@ export class Parcel {
     this.actualDeliveryTime = null;
     this.actualPickupTime = null;
     this.recordOfTransit = [];
+    this.observers = [];
+  }
+
+  public addObserver(observer: IObserver): void {
+    this.observers.push(observer);
+  }
+
+  public removeObserver(observer: IObserver): void {
+    this.observers = this.observers.filter((obs) => obs !== observer);
+  }
+
+  public notifyObservers(notif: string): void {
+    for (const observer of this.observers) {
+      observer.update(this, notif);
+    }
   }
 
   updateRecord(date: Date, type: RecordType, place: string | null): void {
     this.recordOfTransit.push(new TransitRecord(date, type, place));
+    this.notifyObservers(`Parcel ${this.id} has been ${type} at ${place}`);
   }
 
   updateRecipentLocker(locker: Locker): void {
     this.recipientLocker = locker;
+    this.notifyObservers(
+      `Parcel ${this.id} has been rerouted to locker ${locker.id}`,
+    );
   }
 
   updateGuaranteedDeliveryTime(): void {
     this.guaranteedDeliveryTime = dayjs(this.guaranteedDeliveryTime)
       .add(2, "day")
       .toDate();
+    this.notifyObservers(
+      `Parcel ${this.id} has a new guaranteed delivery time of ${this.guaranteedDeliveryTime}`,
+    );
   }
 
   getTransitRecords(): TransitRecord[] {
@@ -79,15 +104,22 @@ export class Parcel {
 
   setPaid(): boolean {
     this.isPaidFor = true;
+    this.notifyObservers(`Parcel ${this.id} has been paid for`);
     return this.isPaidFor;
   }
 
   setActualDeliveryTime(date: Date): void {
     this.actualDeliveryTime = date;
+    this.notifyObservers(
+      `Parcel ${this.id} has been delivered at ${this.recipientLocker.id} by ${this.actualDeliveryTime}`,
+    );
   }
 
   setActualPickupTime(date: Date): void {
     this.actualPickupTime = date;
+    this.notifyObservers(
+      `Parcel ${this.id} has been picked up at ${this.senderLocker.id} by ${this.actualPickupTime}`,
+    );
   }
 
   public getSender(): User {

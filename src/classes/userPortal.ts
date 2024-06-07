@@ -99,6 +99,8 @@ export class UserPortal {
     recipient.addParcelToAccount(parcel, false);
     parcel.updateRecipentLocker(recipientLocker);
     parcel.updateRecord(new Date(), RecordType.PACKAGE_REGISTERED, null);
+    parcel.addObserver(sender);
+    parcel.addObserver(recipient);
     this.parcels.push(parcel);
   }
 
