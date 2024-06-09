@@ -77,3 +77,42 @@ export class Locker {
     return this.slots;
   }
 }
+
+export class LockerBuilder {
+  private id: number;
+  private address: string;
+  private slots: Slot[];
+  private historyRecord: ParcelHistory[];
+
+  constructor() {
+    this.id = 0;
+    this.address = "";
+    this.slots = [];
+    this.historyRecord = [];
+  }
+
+  setId(id: number): LockerBuilder {
+    this.id = id;
+    return this;
+  }
+
+  setAddress(address: string): LockerBuilder {
+    this.address = address;
+    return this;
+  }
+
+  setSlots(slots: Slot[]): LockerBuilder {
+    this.slots = slots;
+    return this;
+  }
+
+  setHistoryRecord(historyRecord: ParcelHistory[]): LockerBuilder {
+    this.historyRecord = historyRecord;
+    return this;
+  }
+
+  build(): Locker {
+    return new Locker(this.id, this.address, this.slots, this.historyRecord);
+  }
+}
+

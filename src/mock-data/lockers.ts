@@ -1,8 +1,8 @@
-import { Locker } from "../classes/locker";
+import { Locker, LockerBuilder } from "../classes/locker";
 import { mockSlots } from "./slots";
 
 export const mockLockers: Locker[] = [
-  new Locker(1, "Address 1", mockSlots[0], []),
-  new Locker(2, "Address 2", mockSlots[1], []),
-  new Locker(3, "Address 3", mockSlots[2], []),
+  new LockerBuilder().setId(1).setAddress("Address 1").setSlots(mockSlots[0]).setHistoryRecord([]).build(),
+  new LockerBuilder().setId(2).setAddress("Address 2").setSlots(mockSlots[1]).setHistoryRecord([]).build(),
+  new LockerBuilder().setId(3).setAddress("Address 3").setSlots(mockSlots[2]).setHistoryRecord([]).build(),
 ];
