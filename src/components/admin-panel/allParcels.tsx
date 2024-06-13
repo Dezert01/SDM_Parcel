@@ -9,9 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TransitRecord } from "@/classes/transitRecord";
+import { Parcel } from "@/classes/parcel";
 const AllParcels: React.FC = () => {
   const userPortal = useUserPortal;
-  const [parcel, setParcel] = useState<any>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [parcel, setParcel] = useState<Parcel | any>(undefined);
   const [openDialog, setOpenDialog] = useState(false);
   const [newLocker, setNewLocker] = useState<number | null>(
     userPortal.getLockers()[0].id || null,
@@ -177,6 +179,10 @@ const AllParcels: React.FC = () => {
                     ? parcel.actualPickupTime.toLocaleString()
                     : "Not yet picked up"}
                 </div>
+              </div>
+              <div>
+                <div>Price</div>
+                <div>{parcel.payment?.calculateCost()}</div>
               </div>
               <div>
                 <div>Is Paid For</div>

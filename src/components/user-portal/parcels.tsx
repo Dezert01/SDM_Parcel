@@ -11,6 +11,7 @@ import {
 import { TransitRecord } from "@/classes/transitRecord";
 import { User } from "@/classes/user";
 import { ParcelSize } from "@/enums/ParcelSize";
+import { Payment } from "@/classes/payment";
 
 type ParcelDetails = {
   id: number;
@@ -23,6 +24,7 @@ type ParcelDetails = {
   actualDeliveryTime: Date | null;
   actualPickupTime: Date | null;
   isPaidFor: boolean;
+  payment: Payment | null;
 };
 
 const Parcels: React.FC = () => {
@@ -58,8 +60,10 @@ const Parcels: React.FC = () => {
       actualDeliveryTime: parcel.getActualDeliveryTime(),
       actualPickupTime: parcel.getActualPickupTime(),
       isPaidFor: parcel.getPaidStatus(),
+      payment: parcel.getPayment(),
     });
     setOpenDialog(true);
+    console.log(parcel.getPayment());
   };
 
   const handleRerouteParcel = (parcelId: number, lockerId: number) => {
@@ -75,54 +79,6 @@ const Parcels: React.FC = () => {
 
   const handleMakePayment = (parcelId: number) => {
     userPortal.makePayment(parcelId);
-  };
-
-  const handleExtendRetrievalDate = (parcelId: number) => {
-    userPortal.extendRetrievalDate(parcelId);
-  };
-
-  const handleDeliverToSenderLocker = (parcelId: number) => {
-    const parcel = userPortal
-      .getParcels()
-      .find((parcel) => parcel.id === parcelId);
-    if (!parcel) {
-      return;
-    }
-    const locker = parcel.getParcelDetails().senderLocker;
-    locker.userPanel.sendParcel(parcel);
-  };
-
-  const handleCollectFromSenderLocker = (parcelId: number) => {
-    const parcel = userPortal
-      .getParcels()
-      .find((parcel) => parcel.id === parcelId);
-    if (!parcel) {
-      return;
-    }
-    const locker = parcel.getParcelDetails().senderLocker;
-    locker.userPanel.retrieveParcel(parcel.id, true);
-  };
-
-  const handleDeliverToRecipientLocker = (parcelId: number) => {
-    const parcel = userPortal
-      .getParcels()
-      .find((parcel) => parcel.id === parcelId);
-    if (!parcel) {
-      return;
-    }
-    const locker = parcel.getParcelDetails().senderLocker;
-    locker.userPanel.deliverParcel(parcel);
-  };
-
-  const handlePickupFromRecipientLocker = (parcelId: number) => {
-    const parcel = userPortal
-      .getParcels()
-      .find((parcel) => parcel.id === parcelId);
-    if (!parcel) {
-      return;
-    }
-    const locker = parcel.getParcelDetails().senderLocker;
-    locker.userPanel.retrieveParcel(parcel.id, false);
   };
 
   return (
@@ -214,6 +170,10 @@ const Parcels: React.FC = () => {
                     ? parcelDetails.actualPickupTime.toLocaleString()
                     : "Not yet picked up"}
                 </div>
+              </div>
+              <div>
+                <div>Price</div>
+                <div>{parcelDetails.payment?.calculateCost()}</div>
               </div>
               <div>
                 <div>Is Paid For</div>

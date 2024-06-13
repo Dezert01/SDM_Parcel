@@ -5,6 +5,7 @@ import { IObserver, ISubject } from "./observer";
 import { TransitRecord } from "./transitRecord";
 import { User } from "./user";
 import dayjs from "dayjs";
+import { Payment } from "./payment";
 
 export class Parcel implements ISubject {
   readonly id: number;
@@ -19,7 +20,7 @@ export class Parcel implements ISubject {
   private recordOfTransit: TransitRecord[];
   readonly parcelSize: ParcelSize;
   private isPaidFor: boolean;
-
+  private payment: Payment | null;
   private observers: IObserver[];
 
   public constructor(
@@ -45,10 +46,15 @@ export class Parcel implements ISubject {
     this.actualPickupTime = null;
     this.recordOfTransit = [];
     this.observers = [];
+    this.payment = null;
   }
 
   public addObserver(observer: IObserver): void {
     this.observers.push(observer);
+  }
+
+  public addPayment(payment: Payment): void {
+    this.payment = payment;
   }
 
   public removeObserver(observer: IObserver): void {
@@ -102,6 +108,10 @@ export class Parcel implements ISubject {
     return this.actualPickupTime;
   }
 
+  getPayment(): Payment | null {
+    return this.payment;
+  }
+
   setPaid(): boolean {
     this.isPaidFor = true;
     this.notifyObservers(`Parcel ${this.id} has been paid for`);
@@ -138,7 +148,6 @@ export class Parcel implements ISubject {
     return this.isPaidFor;
   }
 
-  // only for testing (admin panel)
   public getParcelDetails() {
     return {
       id: this.id,
@@ -153,6 +162,7 @@ export class Parcel implements ISubject {
       actualDeliveryTime: this.actualDeliveryTime,
       actualPickupTime: this.actualPickupTime,
       recordOfTransit: this.recordOfTransit,
+      payment: this.getPayment(),
     };
   }
 }
