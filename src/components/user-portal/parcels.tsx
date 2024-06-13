@@ -218,7 +218,7 @@ const Parcels: React.FC = () => {
             </div>
             <div>
               <h1>Actions</h1>
-              <h2>Reroute LParcel</h2>
+              <h2>Reroute Parcel</h2>
               <div className="flex items-center justify-between">
                 <select
                   value={newLocker || 0}
