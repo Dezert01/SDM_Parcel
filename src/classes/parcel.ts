@@ -11,7 +11,7 @@ export class Parcel implements ISubject {
   private readonly sender: User;
   private readonly recipient: User;
   private recipientLocker: Locker;
-  private readonly senderLocker: Locker;
+  private senderLocker: Locker;
   private estimatedDeliveryTime: Date;
   private actualDeliveryTime: Date | null;
   private guaranteedDeliveryTime: Date;
@@ -66,6 +66,13 @@ export class Parcel implements ISubject {
     this.notifyObservers(`Parcel ${this.id} has been ${type} at ${place}`);
   }
 
+  updateSenderLocker(locker: Locker): void {
+    this.senderLocker = locker;
+    this.notifyObservers(
+      `Parcel ${this.id} has been sent from different locker ${locker.id}`,
+    );
+  }
+
   updateRecipentLocker(locker: Locker): void {
     this.recipientLocker = locker;
     this.notifyObservers(
@@ -100,6 +107,10 @@ export class Parcel implements ISubject {
 
   getActualPickupTime(): Date | null {
     return this.actualPickupTime;
+  }
+
+  getSenderLocker(): Locker {
+    return this.senderLocker;
   }
 
   setPaid(): boolean {
