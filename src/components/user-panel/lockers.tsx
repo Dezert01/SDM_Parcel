@@ -42,7 +42,10 @@ const AllLockers: React.FC = () => {
     userPanel.retrieveParcel(parcelId, byCourier);
   };
 
-  const handleSendParcel = (parcelId: number | null) => {
+  const handleSendParcel = (parcelId: number | null, lockerId: number) => {
+    const locker = userPortal
+      .getLockers()
+      .find((locker) => locker.id === lockerId);
     const userPanel = userPortal
       .getLockers()
       .find((locker) => locker.id === lockerDetails?.id)?.userPanel;
@@ -50,6 +53,9 @@ const AllLockers: React.FC = () => {
       .getParcels()
       .find((parcel) => parcel.id === parcelId);
     if (!userPanel || !parcel) return;
+    if (parcel.getSenderLocker() !== locker && locker) {
+      parcel.updateSenderLocker(locker);
+    }
     userPanel.sendParcel(parcel);
   };
 
@@ -144,7 +150,9 @@ const AllLockers: React.FC = () => {
                 </select>
                 <button
                   className="button"
-                  onClick={() => handleSendParcel(parcelToSend)}
+                  onClick={() =>
+                    handleSendParcel(parcelToSend, lockerDetails.id)
+                  }
                 >
                   Send Parcel
                 </button>

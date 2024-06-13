@@ -3,6 +3,8 @@ import { ParcelSize } from "../../enums/ParcelSize";
 import { useSystemStore } from "../../stores/systemStore";
 import { Locker } from "../../classes/locker";
 import { useUserPortal } from "../../stores/useUserPortal";
+import { AdditionalServices } from "@/enums/AdditionalServices";
+
 const RegisterParcel: React.FC = () => {
   const userPortal = useUserPortal;
   const [recipientPhone, setRecipientPhone] = useState<number>();
@@ -13,8 +15,20 @@ const RegisterParcel: React.FC = () => {
     useState<Locker | null>(userPortal.getLockers()[0] || null);
   const [selectedSenderLocker, setSelectedSenderLocker] =
     useState<Locker | null>(userPortal.getLockers()[0] || null);
+  const [selectedServices, setSelectedServices] = useState({
+    fast: false,
+    weekends: false,
+    insurance: false,
+  });
 
   const systemStore = useSystemStore();
+
+  const handleServiceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedServices({
+      ...selectedServices,
+      [event.target.name]: event.target.checked,
+    });
+  };
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -38,14 +52,25 @@ const RegisterParcel: React.FC = () => {
       return;
     }
 
+    //@ts-expect-error - TS doesn't know that selectedServices is a valid object
+    const additionalServices: AdditionalServices[] =
+      Object.entries(selectedServices)
+        .filter(([, value]) => value)
+        .map(([key]) => {
+          if (key === "fast") return AdditionalServices.FAST_DELIVERY;
+          if (key === "weekends")
+            return AdditionalServices.DELIVERY_ON_WEEKENDS;
+          if (key === "insurance") return AdditionalServices.INSURANCE;
+        }) || [];
+
     userPortal.registerParcel(
       sender.id,
       recipient.id,
       selectedRecipientLocker?.id || 0,
       selectedSenderLocker?.id || 0,
       parcelSize,
+      additionalServices,
     );
-    console.log(userPortal);
   };
 
   return (
@@ -124,6 +149,30 @@ const RegisterParcel: React.FC = () => {
             </option>
           ))}
         </select>
+        <label>Fast Delivery</label>
+        <input
+          type="checkbox"
+          id="fast"
+          name="fast"
+          checked={selectedServices.fast}
+          onChange={handleServiceChange}
+        />
+        <label>Delivery on Weeekends</label>
+        <input
+          type="checkbox"
+          id="weekends"
+          name="weekends"
+          checked={selectedServices.weekends}
+          onChange={handleServiceChange}
+        />
+        <label>Insurance</label>
+        <input
+          type="checkbox"
+          id="insurance"
+          name="insurance"
+          checked={selectedServices.insurance}
+          onChange={handleServiceChange}
+        />
         <button className="button mt-4" type="submit">
           Register Parcel
         </button>

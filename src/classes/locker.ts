@@ -76,6 +76,10 @@ export class Locker {
   public getSlots(): Slot[] {
     return this.slots;
   }
+
+  public extendLockerSlots(newSlots: Slot[]): void {
+    this.slots = this.slots.concat(newSlots);
+  }
 }
 
 export class LockerBuilder {
@@ -115,4 +119,3 @@ export class LockerBuilder {
     return new Locker(this.id, this.address, this.slots, this.historyRecord);
   }
 }
-

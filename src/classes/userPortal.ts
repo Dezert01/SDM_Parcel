@@ -1,7 +1,9 @@
+import { AdditionalServices } from "@/enums/AdditionalServices";
 import { ParcelSize } from "../enums/ParcelSize";
 import { RecordType } from "../enums/RecordType";
 import { Locker } from "./locker";
 import { Parcel } from "./parcel";
+import { Payment } from "./payment";
 import { CStorage } from "./storage";
 import { User } from "./user";
 import dayjs from "dayjs";
@@ -68,6 +70,7 @@ export class UserPortal {
     recipientLockerId: number,
     senderLockerId: number,
     size: ParcelSize,
+    additionalServices?: AdditionalServices[],
   ): void {
     const parcelId =
       this.parcels.length > 0
@@ -95,12 +98,14 @@ export class UserPortal {
       dayjs().add(5, "day").toDate(),
       size,
     );
+    const payment = new Payment(parcel, additionalServices);
     sender.addParcelToAccount(parcel, true);
     recipient.addParcelToAccount(parcel, false);
     parcel.updateRecipentLocker(recipientLocker);
     parcel.updateRecord(new Date(), RecordType.PACKAGE_REGISTERED, null);
     parcel.addObserver(sender);
     parcel.addObserver(recipient);
+    parcel.addPayment(payment);
     this.parcels.push(parcel);
   }
 

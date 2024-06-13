@@ -1,6 +1,7 @@
 import { RecordType } from "@/enums/RecordType";
 import { Parcel } from "./parcel";
 import { Slot } from "./slot";
+import { ParcelSize } from "@/enums/ParcelSize";
 
 export class UserPanel {
   private slots: Slot[];
@@ -65,12 +66,29 @@ export class UserPanel {
   }
 
   public indicateSlot(parcel: Parcel): Slot | null {
-    const slot = this.slots.find(
-      (slot) => slot.getParcel() === null && slot.size === parcel.parcelSize,
+    const availableSlots = this.slots.filter(
+      (slot) => slot.getParcel() === null,
     );
-    if (slot) {
-      return slot;
+
+    availableSlots.sort((a, b) => {
+      const sizeOrder = Object.values(ParcelSize);
+      return sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size);
+    });
+
+    for (const slot of availableSlots) {
+      if (slot.size === parcel.parcelSize) {
+        return slot;
+      }
+
+      const sizeOrder = Object.values(ParcelSize);
+      const slotIndex = sizeOrder.indexOf(slot.size);
+      const parcelIndex = sizeOrder.indexOf(parcel.parcelSize);
+
+      if (slotIndex > parcelIndex) {
+        return slot;
+      }
     }
+
     return null;
   }
 }

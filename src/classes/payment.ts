@@ -1,3 +1,4 @@
+import { ParcelSize } from "@/enums/ParcelSize";
 import { AdditionalServices } from "../enums/AdditionalServices";
 import { Parcel } from "./parcel";
 
@@ -43,17 +44,34 @@ class InsuranceCostStrategy extends AbstractCostStrategy {
   }
 }
 
+class SmallParcelCostStrategy extends AbstractCostStrategy {
+  protected addCost(baseCost: number): number {
+    return baseCost + 5;
+  }
+}
+
+class MediumParcelCostStrategy extends AbstractCostStrategy {
+  protected addCost(baseCost: number): number {
+    return baseCost + 10;
+  }
+}
+
+class LargeParcelCostStrategy extends AbstractCostStrategy {
+  protected addCost(baseCost: number): number {
+    return baseCost + 15;
+  }
+}
+
 export class Payment {
   private cost: number;
   private costStrategy: CostStrategy | null = null;
   private parcel: Parcel;
 
   public constructor(
-    cost: number,
     parcel: Parcel,
     additionalServices?: AdditionalServices[],
   ) {
-    this.cost = cost;
+    this.cost = this.setParcelSizeCostStrategy(parcel.getSize());
     this.parcel = parcel;
 
     if (additionalServices) {
@@ -65,11 +83,27 @@ export class Payment {
           case AdditionalServices.DELIVERY_ON_WEEKENDS:
             this.setStrategy(new DeliveryOnWeekendsCostStrategy(), index);
             break;
-          case AdditionalServices.INSUCARNCE:
+          case AdditionalServices.INSURANCE:
             this.setStrategy(new InsuranceCostStrategy(), index);
             break;
         }
       });
+    }
+  }
+
+  private setParcelSizeCostStrategy(size: ParcelSize): number {
+    switch (size) {
+      case ParcelSize.SMALL:
+        this.costStrategy = new SmallParcelCostStrategy();
+        return 5;
+      case ParcelSize.MEDIUM:
+        this.costStrategy = new MediumParcelCostStrategy();
+        return 10;
+      case ParcelSize.LARGE:
+        this.costStrategy = new LargeParcelCostStrategy();
+        return 15;
+      default:
+        throw new Error(`Invalid parcel size: ${size}`);
     }
   }
 
@@ -84,6 +118,7 @@ export class Payment {
   }
 
   public calculateCost(): number {
+    console.log("Calculating cost");
     if (this.costStrategy) {
       return this.costStrategy.calculateCost(this.cost);
     } else {

@@ -5,13 +5,14 @@ import { IObserver, ISubject } from "./observer";
 import { TransitRecord } from "./transitRecord";
 import { User } from "./user";
 import dayjs from "dayjs";
+import { Payment } from "./payment";
 
 export class Parcel implements ISubject {
   readonly id: number;
   private readonly sender: User;
   private readonly recipient: User;
   private recipientLocker: Locker;
-  private readonly senderLocker: Locker;
+  private senderLocker: Locker;
   private estimatedDeliveryTime: Date;
   private actualDeliveryTime: Date | null;
   private guaranteedDeliveryTime: Date;
@@ -19,7 +20,7 @@ export class Parcel implements ISubject {
   private recordOfTransit: TransitRecord[];
   readonly parcelSize: ParcelSize;
   private isPaidFor: boolean;
-
+  private payment: Payment | null;
   private observers: IObserver[];
 
   public constructor(
@@ -45,10 +46,15 @@ export class Parcel implements ISubject {
     this.actualPickupTime = null;
     this.recordOfTransit = [];
     this.observers = [];
+    this.payment = null;
   }
 
   public addObserver(observer: IObserver): void {
     this.observers.push(observer);
+  }
+
+  public addPayment(payment: Payment): void {
+    this.payment = payment;
   }
 
   public removeObserver(observer: IObserver): void {
@@ -64,6 +70,13 @@ export class Parcel implements ISubject {
   updateRecord(date: Date, type: RecordType, place: string | null): void {
     this.recordOfTransit.push(new TransitRecord(date, type, place));
     this.notifyObservers(`Parcel ${this.id} has been ${type} at ${place}`);
+  }
+
+  updateSenderLocker(locker: Locker): void {
+    this.senderLocker = locker;
+    this.notifyObservers(
+      `Parcel ${this.id} has been sent from different locker ${locker.id}`,
+    );
   }
 
   updateRecipentLocker(locker: Locker): void {
@@ -102,6 +115,14 @@ export class Parcel implements ISubject {
     return this.actualPickupTime;
   }
 
+  getPayment(): Payment | null {
+    return this.payment;
+  }
+
+  getSenderLocker(): Locker {
+    return this.senderLocker;
+  }
+
   setPaid(): boolean {
     this.isPaidFor = true;
     this.notifyObservers(`Parcel ${this.id} has been paid for`);
@@ -138,7 +159,6 @@ export class Parcel implements ISubject {
     return this.isPaidFor;
   }
 
-  // only for testing (admin panel)
   public getParcelDetails() {
     return {
       id: this.id,
@@ -153,6 +173,7 @@ export class Parcel implements ISubject {
       actualDeliveryTime: this.actualDeliveryTime,
       actualPickupTime: this.actualPickupTime,
       recordOfTransit: this.recordOfTransit,
+      payment: this.getPayment(),
     };
   }
 }

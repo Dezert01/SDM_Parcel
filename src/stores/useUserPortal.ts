@@ -22,5 +22,6 @@ mockParcels.forEach((parcel) => {
     parcel.recipientLockerId,
     parcel.senderLockerId,
     parcel.size,
+    [],
   );
 });
