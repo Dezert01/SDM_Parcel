@@ -2,17 +2,26 @@ import { RecordType } from "@/enums/RecordType";
 import { Parcel } from "./parcel";
 import { Slot } from "./slot";
 import { ParcelSize } from "@/enums/ParcelSize";
+import { useUserPortal } from "@/stores/useUserPortal";
+import { ParcelHistory } from "./parcelHistory";
+import { HistoryType } from "@/enums/HistoryType";
 
 export class UserPanel {
   private slots: Slot[];
   private address: string;
+  private lockerId: number;
 
-  constructor(slots: Slot[], address: string) {
+  constructor(slots: Slot[], address: string, lockerId: number) {
     this.slots = slots;
     this.address = address;
+    this.lockerId = lockerId;
   }
 
   public sendParcel(parcel: Parcel): boolean {
+    const userPortal = useUserPortal;
+    const locker = userPortal
+      .getLockers()
+      .find((locker) => locker.id === this.lockerId);
     const slot = this.indicateSlot(parcel);
     if (slot) {
       slot.setParcel(parcel);
@@ -21,6 +30,12 @@ export class UserPanel {
         RecordType.PACKAGE_IN_SENDER_LOCKER,
         this.address,
       );
+      locker?.addToHistory(
+        new ParcelHistory(parcel.id, new Date(), HistoryType.PACKAGE_SEND),
+      );
+      if (parcel.getSenderLocker() !== locker && locker) {
+        parcel.updateSenderLocker(locker);
+      }
       return true;
     }
     console.log("No available slots");
@@ -28,6 +43,10 @@ export class UserPanel {
   }
 
   public deliverParcel(parcel: Parcel): boolean {
+    const userPortal = useUserPortal;
+    const locker = userPortal
+      .getLockers()
+      .find((locker) => locker.id === this.lockerId);
     const slot = this.indicateSlot(parcel);
     if (slot) {
       slot.setParcel(parcel);
@@ -38,6 +57,13 @@ export class UserPanel {
         this.address,
       );
       parcel.setActualDeliveryTime(date);
+      locker?.addToHistory(
+        new ParcelHistory(
+          parcel.id,
+          new Date(),
+          HistoryType.PACKAGE_IN_RECEIVER_LOCKER,
+        ),
+      );
       return true;
     }
     console.log("No available slots");
@@ -45,6 +71,10 @@ export class UserPanel {
   }
 
   public retrieveParcel(parcelId: number, byCourier: boolean): Parcel | null {
+    const userPortal = useUserPortal;
+    const locker = userPortal
+      .getLockers()
+      .find((locker) => locker.id === this.lockerId);
     const slot = this.slots.find((slot) => slot.getParcel()?.id === parcelId);
     if (slot) {
       const parcel = slot.getParcel();
@@ -60,6 +90,16 @@ export class UserPanel {
         parcel?.updateRecord(date, RecordType.PACKAGE_RECEIVED, this.address);
         parcel?.setActualPickupTime(date);
       }
+
+      locker?.addToHistory(
+        new ParcelHistory(
+          parcel!.id,
+          new Date(),
+          byCourier
+            ? HistoryType.PACKAGE_RECEIVE_COURIER
+            : HistoryType.PACKAGE_RECEIVE_RECEIVER,
+        ),
+      );
       return parcel;
     }
     return null;

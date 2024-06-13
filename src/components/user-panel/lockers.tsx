@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Slot } from "@/classes/slot";
+import { ParcelHistory } from "@/classes/parcelHistory";
 
 type LockerDetails = {
   id: number;
   slots: Slot[];
+  historyRecord: ParcelHistory[];
 };
 
 const AllLockers: React.FC = () => {
@@ -30,7 +32,9 @@ const AllLockers: React.FC = () => {
     setLockerDetails({
       id: locker.id,
       slots: locker.getSlots(),
+      historyRecord: locker.getHistoryOfParcels(),
     });
+    console.log(locker.getHistoryOfParcels());
     setOpenDialog(true);
   };
 
@@ -42,10 +46,7 @@ const AllLockers: React.FC = () => {
     userPanel.retrieveParcel(parcelId, byCourier);
   };
 
-  const handleSendParcel = (parcelId: number | null, lockerId: number) => {
-    const locker = userPortal
-      .getLockers()
-      .find((locker) => locker.id === lockerId);
+  const handleSendParcel = (parcelId: number | null) => {
     const userPanel = userPortal
       .getLockers()
       .find((locker) => locker.id === lockerDetails?.id)?.userPanel;
@@ -53,9 +54,6 @@ const AllLockers: React.FC = () => {
       .getParcels()
       .find((parcel) => parcel.id === parcelId);
     if (!userPanel || !parcel) return;
-    if (parcel.getSenderLocker() !== locker && locker) {
-      parcel.updateSenderLocker(locker);
-    }
     userPanel.sendParcel(parcel);
   };
 
@@ -150,9 +148,7 @@ const AllLockers: React.FC = () => {
                 </select>
                 <button
                   className="button"
-                  onClick={() =>
-                    handleSendParcel(parcelToSend, lockerDetails.id)
-                  }
+                  onClick={() => handleSendParcel(parcelToSend)}
                 >
                   Send Parcel
                 </button>
@@ -196,6 +192,14 @@ const AllLockers: React.FC = () => {
                   Deliver Parcel
                 </button>
               </div>
+              <h2>Parcel History</h2>
+              {lockerDetails?.historyRecord.map((record, index) => (
+                <div key={index}>
+                  <p>Parcel ID: {record.parcelId}</p>
+                  <p>Time: {record.time.toLocaleDateString()}</p>
+                  <p>Event: {record.event}</p>
+                </div>
+              ))}
             </div>
             <DialogFooter>
               <button className="button" onClick={() => setOpenDialog(false)}>

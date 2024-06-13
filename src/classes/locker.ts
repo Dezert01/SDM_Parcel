@@ -24,7 +24,7 @@ export class Locker {
     this.slots = slots;
     this.historyRecord = historyRecord;
     this.incomingParcels = [];
-    this.userPanel = new UserPanel(slots, address);
+    this.userPanel = new UserPanel(slots, address, id);
   }
 
   public changeLockerAddress(newAddress: string): void {
@@ -34,7 +34,7 @@ export class Locker {
   public getHistoryOfParcels(): ParcelHistory[] {
     const oneWeekAgo = dayjs().subtract(7, "day");
     const recentParcels = this.historyRecord.filter((parcelHistory) =>
-      dayjs(parcelHistory.depositTime).isAfter(oneWeekAgo),
+      dayjs(parcelHistory.time).isAfter(oneWeekAgo),
     );
 
     return recentParcels;
@@ -49,6 +49,10 @@ export class Locker {
 
   public getPlannedParcels(): Parcel[] {
     return this.incomingParcels;
+  }
+
+  public addToHistory(parcelHistory: ParcelHistory): void {
+    this.historyRecord.push(parcelHistory);
   }
 
   public moveToExternalStorage(

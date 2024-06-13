@@ -123,6 +123,10 @@ export class Parcel implements ISubject {
     return this.senderLocker;
   }
 
+  getRecipientLocker(): Locker {
+    return this.recipientLocker;
+  }
+
   setPaid(): boolean {
     this.isPaidFor = true;
     this.notifyObservers(`Parcel ${this.id} has been paid for`);

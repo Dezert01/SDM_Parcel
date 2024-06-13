@@ -1,22 +1,13 @@
+import { HistoryType } from "@/enums/HistoryType";
+
 export class ParcelHistory {
-  readonly id: number;
   readonly parcelId: number;
-  readonly depositTime: Date;
-  private collectionTime: Date;
+  readonly time: Date;
+  readonly event: HistoryType;
 
-  public constructor(
-    id: number,
-    parcelId: number,
-    depositTime: Date,
-    collectionTime: Date,
-  ) {
-    this.id = id;
+  public constructor(parcelId: number, time: Date, event: HistoryType) {
     this.parcelId = parcelId;
-    this.depositTime = depositTime;
-    this.collectionTime = collectionTime;
-  }
-
-  public updateCollectionTime(time: Date): void {
-    this.collectionTime = time;
+    this.time = time;
+    this.event = event;
   }
 }
