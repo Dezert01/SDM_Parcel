@@ -10,7 +10,8 @@ const SignForm: React.FC = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
-  const handleSignIn = () => {
+  const handleSignIn = (e: React.MouseEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (
       !usernameRef ||
       !usernameRef.current ||
@@ -30,7 +31,8 @@ const SignForm: React.FC = () => {
     }
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = (e: React.MouseEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (
       !usernameRef ||
       !usernameRef.current ||
